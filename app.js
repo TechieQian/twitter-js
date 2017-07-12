@@ -1,6 +1,13 @@
 const express = require( 'express' );
+const nunjucks = require('nunjucks')
 
 const twitterApp = express();
+
+nunjucks.configure('views');
+
+nunjucks.render('index.html', function(err, res) {
+  console.log("testing render")
+})
 
 twitterApp.use(function(req,res,next) {
   console.log(req.method, req.originalUrl, res.statusCode)
