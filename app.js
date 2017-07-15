@@ -1,31 +1,35 @@
 const express = require( 'express' );
 const nunjucks = require('nunjucks')
+const db = require('./db.js')
+const tb = require('./tweetBank.js')
+const bodyParser = require('body-parser')
+const app = express();
+const routes = require('./routes');
 
-const twitterApp = express();
+nunjucks.configure('views', { noCache : true});
 
-nunjucks.configure('views');
+app.engine('html', nunjucks.render);
+app.set('view engine', 'html')
 
-nunjucks.render('index.html', function(err, res) {
-  console.log("testing render")
-})
+const server = app.listen(3000);
+const io = require('socket.io')(server)
 
-twitterApp.use(function(req,res,next) {
+
+app.use(bodyParser.urlencoded({ extended: false }))
+
+app.use( '/', routes(io) );
+
+app.use(express.static('public'))
+
+
+app.use(function(req,res,next) {
   console.log(req.method, req.originalUrl, res.statusCode)
+  console.log(tb.list)
+  console.log("Under construction")
   next()
 })
 
-twitterApp.use('/news/', function(req,res,next) {
+app.use('/news/', function(req,res,next) {
   console.log(req.method, req.originalUrl, "welcome to news")
   next()
 })
-
-
-twitterApp.get('/', function (req,res) {
-  res.send("hello world 2")
-})
-
-twitterApp.get('/news', function(req,res) {
-  res.send("another message")
-})
-
-twitterApp.listen(3000)
